@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: de-afrekening
+    name: the-ultimate-weekend-game
     runtime: node
     plan: free
     buildCommand: npm install
