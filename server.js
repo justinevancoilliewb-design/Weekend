@@ -5,15 +5,24 @@ const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 
-const { db, getSetting, setSetting } = require('./db');
-const { QUESTIONS, HOUSE_META, scoreAnswers } = require('./scoring');
+const { restoreDbIfMissing, backupDb } = require('./github-backup');
 
 const PORT = process.env.PORT || 3000;
 const ACCESS_CODE = process.env.ACCESS_CODE || 'meeuwen2026';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '2846';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'de-afrekening-geheim';
 
-const app = express();
+function backgroundBackup() {
+  backupDb().catch((err) => console.error('Achtergrond-backup mislukt:', err.message));
+}
+
+async function main() {
+  await restoreDbIfMissing();
+
+  const { db, getSetting, setSetting } = require('./db');
+  const { QUESTIONS, HOUSE_META, scoreAnswers } = require('./scoring');
+
+  const app = express();
 app.use(express.json());
 app.use(
   session({
@@ -123,6 +132,7 @@ app.post('/api/submit', requireUser, (req, res) => {
   );
 
   res.json({ ok: true });
+  backgroundBackup();
 });
 
 app.get('/api/reveal', requireUser, (req, res) => {
@@ -161,6 +171,7 @@ app.post('/api/admin/reveal', requireAdmin, (req, res) => {
   const { revealed } = req.body || {};
   setSetting('revealed', revealed ? 'true' : 'false');
   res.json({ ok: true });
+  backgroundBackup();
 });
 
 app.get('/api/admin/backup', requireAdmin, (req, res) => {
@@ -227,6 +238,7 @@ app.post('/api/admin/analyze', requireAdmin, (req, res) => {
   }
 
   res.json({ ok: true, analyzed });
+  backgroundBackup();
 });
 
 app.use((err, req, res, next) => {
@@ -234,8 +246,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Er ging iets mis. Probeer opnieuw.' });
 });
 
-app.listen(PORT, () => {
-  console.log(`De Afrekening draait op http://localhost:${PORT}`);
-  console.log(`Toegangscode voor registratie: ${ACCESS_CODE}`);
-  console.log(`Admin-wachtwoord: ${ADMIN_PASSWORD}`);
-});
+  app.listen(PORT, () => {
+    console.log(`De Afrekening draait op http://localhost:${PORT}`);
+    console.log(`Toegangscode voor registratie: ${ACCESS_CODE}`);
+    console.log(`Admin-wachtwoord: ${ADMIN_PASSWORD}`);
+  });
+}
+
+main();

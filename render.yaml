@@ -13,3 +13,9 @@ services:
         sync: false
       - key: SESSION_SECRET
         generateValue: true
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_REPO
+        sync: false
+      - key: GITHUB_BACKUP_BRANCH
+        value: master

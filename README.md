@@ -43,6 +43,21 @@ npm start
 
 Dit draait nu alleen lokaal (`localhost`). Als de 18 deelnemers er allemaal via hun eigen telefoon/laptop bij moeten kunnen (niet allemaal op hetzelfde apparaat als de organisator), moet dit gedeployed worden naar een echte server (bv. Render, Railway, Fly.io) zodat er een publieke URL is — zeg het als je dat wil, dan zet ik dat op.
 
+## Data bewaren op een gratis hosting-tier (GitHub-backup)
+
+Gratis instances (bv. Render's gratis plan) hebben geen permanente schijf: bij elke herstart (na inactiviteit, of na een nieuwe deploy) is de lokale `afrekening.db` weg. Om dit gratis op te lossen, commit de app na elke inzending/analyse/onthulling automatisch een backup van de databank naar een GitHub-repo, en herstelt die backup automatisch bij het opstarten als de lokale databank leeg is (`github-backup.js`).
+
+Dit activeren:
+
+1. Maak op GitHub een **fine-grained personal access token** aan (Settings → Developer settings → Personal access tokens → Fine-grained tokens), gescoped tot enkel de repo waar je dit in draait, met **Contents: Read and write**-rechten.
+2. Zet in Render (of lokaal als environment variable) deze waarden:
+   - `GITHUB_TOKEN` — het token van stap 1.
+   - `GITHUB_REPO` — bv. `jouw-account/jouw-repo`.
+   - `GITHUB_BACKUP_BRANCH` — de branch waarin de backup terechtkomt (standaard `master`).
+3. Herstart/herdeploy. Bij elke inzending, analyse of onthulling verschijnt er een nieuwe commit in `backup/afrekening.db` op die branch.
+
+Zonder deze env vars werkt de app gewoon verder zoals voorheen (enkel lokale opslag, geen automatische backup) — dit is volledig optioneel.
+
 ## Bestanden
 
 - `server.js` — Express-server, routes voor login/registratie/vragenlijst/admin.
