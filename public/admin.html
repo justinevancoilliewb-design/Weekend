@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De Afrekening &mdash; Organisator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="stage center" id="pingateStage">
+  <h1 class="title" style="font-size:30px;">Toegang organisator</h1>
+  <p class="lede">Deze resultaten zijn afgeschermd. Voer het wachtwoord in.</p>
+  <input type="password" class="pin-field" id="pinInput" placeholder="&bull;&bull;&bull;&bull;">
+  <div class="error" id="pinError"></div>
+  <button class="btn" id="pinBtn">ONTGRENDEL</button>
+</div>
+
+<div class="stage wide" id="adminStage" style="display:none;">
+  <div class="admin-head">
+    <h2>Inzendingen</h2>
+    <div class="admin-actions">
+      <button class="admin-btn" id="analyzeBtn" disabled>ANALYSEER GESELECTEERDEN (0)</button>
+      <button class="admin-btn" id="revealBtn">ONTHULLEN</button>
+      <button class="admin-btn" id="refreshBtn">VERVERSEN</button>
+      <a class="admin-btn" id="backupBtn" href="/api/admin/backup" style="text-decoration:none; display:inline-block;">BACKUP DOWNLOADEN</a>
+      <button class="admin-btn danger" id="logoutBtn">UITLOGGEN</button>
+    </div>
+  </div>
+  <p class="lede" style="margin-bottom:24px;" id="revealStatus"></p>
+  <div class="tally" id="tally"></div>
+  <div class="roster" id="roster"></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const HOUSE_ORDER = ['stark','lannister','targaryen','baratheon'];
+let revealed = false;
+const selected = new Set();
+
+async function api(path, options){
+  const res = await fetch(path, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data.error || 'Er ging iets mis.');
+  return data;
+}
+
+$('pinBtn').addEventListener('click', async () => {
+  $('pinError').textContent = '';
+  try {
+    await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: $('pinInput').value }) });
+    $('pingateStage').style.display = 'none';
+    $('adminStage').style.display = 'block';
+    await loadState();
+    await loadRoster();
+  } catch(err){
+    $('pinError').textContent = err.message;
+    $('pinInput').value = '';
+  }
+});
+$('pinInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') $('pinBtn').click(); });
+
+$('refreshBtn').addEventListener('click', loadRoster);
+
+function updateAnalyzeBtn(){
+  $('analyzeBtn').textContent = `ANALYSEER GESELECTEERDEN (${selected.size})`;
+  $('analyzeBtn').disabled = selected.size === 0;
+}
+
+$('analyzeBtn').addEventListener('click', async () => {
+  if(selected.size === 0) return;
+  $('analyzeBtn').disabled = true;
+  try {
+    await api('/api/admin/analyze', { method: 'POST', body: JSON.stringify({ userIds: [...selected] }) });
+    selected.clear();
+    await loadRoster();
+  } catch(err){
+    alert(err.message);
+    updateAnalyzeBtn();
+  }
+});
+$('logoutBtn').addEventListener('click', async () => {
+  await api('/api/admin/logout', { method: 'POST' });
+  location.reload();
+});
+
+$('revealBtn').addEventListener('click', async () => {
+  revealed = !revealed;
+  await api('/api/admin/reveal', { method: 'POST', body: JSON.stringify({ revealed }) });
+  updateRevealUi();
+});
+
+function updateRevealUi(){
+  $('revealBtn').textContent = revealed ? 'VERBERGEN' : 'ONTHULLEN';
+  $('revealBtn').classList.toggle('on', revealed);
+  $('revealStatus').textContent = revealed
+    ? 'De huizen zijn nu zichtbaar voor iedereen die is ingelogd.'
+    : 'De huizen zijn nog verborgen voor de deelnemers.';
+}
+
+async function loadState(){
+  const state = await api('/api/admin/state');
+  revealed = state.revealed;
+  updateRevealUi();
+}
+
+async function loadRoster(){
+  const rosterEl = $('roster');
+  const tallyEl = $('tally');
+  rosterEl.innerHTML = '<div class="empty-note">Laden…</div>';
+
+  let data;
+  try {
+    data = await api('/api/admin/roster');
+  } catch(err){
+    rosterEl.innerHTML = `<div class="empty-note">${err.message}</div>`;
+    return;
+  }
+
+  tallyEl.innerHTML = '';
+  HOUSE_ORDER.forEach(h => {
+    const meta = data.roster.find(r => r.house && r.house.key === h)?.house;
+    const color = meta ? meta.color : '#A79D87';
+    const name = meta ? meta.name : h;
+    tallyEl.innerHTML += `<div class="tally-item"><div class="n" style="color:${color}">${data.counts[h] || 0}</div><div class="h">${name.toUpperCase()}</div></div>`;
+  });
+
+  // Alleen nog geldige, nog steeds ingezonden personen bewaren in de selectie.
+  const submittedIds = new Set(data.roster.filter(r => r.hasSubmitted).map(r => r.userId));
+  [...selected].forEach(id => { if(!submittedIds.has(id)) selected.delete(id); });
+  updateAnalyzeBtn();
+
+  if(data.roster.length === 0){
+    rosterEl.innerHTML = '<div class="empty-note">Nog geen geregistreerde deelnemers.</div>';
+    return;
+  }
+
+  let rows = `
+    <div class="roster-row head">
+      <div></div><div>NAAM</div><div>HUIS</div><div>SCORES (S / L / T / B)</div><div>TIJD</div>
+    </div>
+  `;
+  data.roster.forEach((r, i) => {
+    const hm = r.isAnalyzed
+      ? r.house
+      : { name: r.hasSubmitted ? '— nog niet geanalyseerd —' : '— nog niet ingevuld —', color: '#A79D87' };
+    const s = r.scores || {};
+    const scoreStr = r.isAnalyzed ? `${s.stark ?? 0} / ${s.lannister ?? 0} / ${s.targaryen ?? 0} / ${s.baratheon ?? 0}` : '—';
+    const time = r.submittedAt ? new Date(r.submittedAt + 'Z').toLocaleString('nl-BE') : '—';
+    const checked = selected.has(r.userId) ? 'checked' : '';
+
+    let openHtml = '';
+    if(r.answers){
+      openHtml = '<div class="open-answers" style="display:none;" id="answers-' + i + '">' + data.questions.map(q =>
+        `<div><span class="qlabel">${q.text}</span><br>${r.answers[q.key] ?? ''}</div>`
+      ).join('') + '</div>';
+    }
+
+    const reasonHtml = (r.isAnalyzed && r.reasons && r.reasons.length)
+      ? `<div class="rreason">Waarom ${hm.name}: ${r.reasons.join('; ')}.</div>`
+      : '';
+
+    rows += `
+      <div class="roster-entry">
+        <div class="roster-row">
+          <div class="rselect">${r.hasSubmitted ? `<input type="checkbox" data-user-id="${r.userId}" ${checked}>` : ''}</div>
+          <div class="rname">${r.name}</div>
+          <div class="rhouse" style="color:${hm.color}">${hm.name}</div>
+          <div class="rscores">${scoreStr}</div>
+          <div class="rtime">${time}</div>
+        </div>
+        ${reasonHtml}
+        ${r.answers ? `<button class="details-toggle" data-target="answers-${i}">ANTWOORDEN TONEN</button>` : ''}
+        ${openHtml}
+      </div>
+    `;
+  });
+  rosterEl.innerHTML = rows;
+
+  rosterEl.querySelectorAll('.details-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      const isHidden = target.style.display === 'none';
+      target.style.display = isHidden ? 'block' : 'none';
+      btn.textContent = isHidden ? 'ANTWOORDEN VERBERGEN' : 'ANTWOORDEN TONEN';
+    });
+  });
+
+  rosterEl.querySelectorAll('.rselect input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const id = Number(cb.dataset.userId);
+      if(cb.checked) selected.add(id); else selected.delete(id);
+      updateAnalyzeBtn();
+    });
+  });
+}
+</script>
+
+</body>
+</html>

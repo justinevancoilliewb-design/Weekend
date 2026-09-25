@@ -1,0 +1,4 @@
+node_modules/
+afrekening.db
+afrekening.db-journal
+*.log

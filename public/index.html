@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De Afrekening</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <symbol id="shield-frame" viewBox="0 0 80 96">
+      <path d="M10,10 L70,10 L70,44 C70,70 55,88 40,94 C25,88 10,70 10,44 Z" fill="currentColor" fill-opacity="0.16" stroke="#B08D4F" stroke-width="2"/>
+      <path d="M15,15 L65,15 L65,43 C65,66 52,82 40,88 C28,82 15,66 15,43 Z" fill="none" stroke="#B08D4F" stroke-width="1" opacity="0.6"/>
+    </symbol>
+
+    <symbol id="crest-stark" viewBox="0 0 80 96">
+      <use href="#shield-frame"/>
+      <g stroke="currentColor" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M22,58 L26,42 L23,30 L33,20 L38,30 L50,24 L62,32 L58,42 L66,48 L56,50 L55,58 L46,56 L40,64 L30,60 Z"/>
+        <path d="M33,20 L36,28" stroke-width="1.4"/>
+        <path d="M46,40 L52,38 M46,44 L53,43 M46,48 L52,47" stroke-width="1.2"/>
+        <path d="M30,58 L34,62 M38,60 L42,64" stroke-width="1.2"/>
+        <path d="M56,50 L60,52 L58,56 L54,54 Z" stroke-width="1.1"/>
+        <circle cx="41" cy="34" r="1.6" fill="currentColor" stroke="none"/>
+      </g>
+    </symbol>
+
+    <symbol id="crest-lannister" viewBox="0 0 80 96">
+      <use href="#shield-frame"/>
+      <g stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="40" cy="44" r="11"/>
+        <g stroke-width="1.6">
+          <line x1="40" y1="18" x2="40" y2="28"/>
+          <line x1="40" y1="60" x2="40" y2="70"/>
+          <line x1="14" y1="44" x2="24" y2="44"/>
+          <line x1="56" y1="44" x2="66" y2="44"/>
+          <line x1="21" y1="25" x2="28" y2="32"/>
+          <line x1="59" y1="25" x2="52" y2="32"/>
+          <line x1="21" y1="63" x2="28" y2="56"/>
+          <line x1="59" y1="63" x2="52" y2="56"/>
+          <line x1="29" y1="19" x2="33" y2="27"/>
+          <line x1="51" y1="19" x2="47" y2="27"/>
+          <line x1="29" y1="69" x2="33" y2="61"/>
+          <line x1="51" y1="69" x2="47" y2="61"/>
+          <line x1="17" y1="34" x2="25" y2="38"/>
+          <line x1="63" y1="34" x2="55" y2="38"/>
+          <line x1="17" y1="54" x2="25" y2="50"/>
+          <line x1="63" y1="54" x2="55" y2="50"/>
+        </g>
+        <circle cx="35" cy="42" r="1.6" fill="currentColor" stroke="none"/>
+        <circle cx="45" cy="42" r="1.6" fill="currentColor" stroke="none"/>
+        <path d="M40,44 L40,49" stroke-width="1.3"/>
+        <path d="M33,52 Q40,56 47,52" stroke-width="1.3"/>
+        <path d="M30,48 L20,46 M30,50 L20,50 M50,48 L60,46 M50,50 L60,50" stroke-width="0.9"/>
+      </g>
+    </symbol>
+
+    <symbol id="crest-targaryen" viewBox="0 0 80 96">
+      <use href="#shield-frame"/>
+      <g stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20,62 C17,50 19,36 28,28 C33,24 38,22 43,19"/>
+        <path d="M43,19 L52,14 L49,23 L43,24 Z"/>
+        <path d="M31,27 L27,21 M36,23 L33,17" stroke-width="1.2"/>
+        <path d="M33,42 L56,32 L47,53 Z" stroke-width="1.6"/>
+        <path d="M40,44 L48,40 M38,49 L45,46" stroke-width="1"/>
+        <path d="M20,62 C16,66 11,64 8,68" stroke-width="1.6"/>
+        <circle cx="47" cy="18" r="1.3" fill="currentColor" stroke="none"/>
+      </g>
+    </symbol>
+
+    <symbol id="crest-baratheon" viewBox="0 0 80 96">
+      <use href="#shield-frame"/>
+      <g stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M40,62 L40,40"/>
+        <ellipse cx="40" cy="46" rx="7" ry="9"/>
+        <path d="M34,40 L30,34 M46,40 L50,34" stroke-width="1.5"/>
+        <circle cx="37" cy="44" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="43" cy="44" r="1.3" fill="currentColor" stroke="none"/>
+        <path d="M40,40 C30,38 26,26 16,22 M22,30 C18,30 15,27 12,27 M30,34 C24,28 26,18 20,12" stroke-width="1.5"/>
+        <path d="M40,40 C50,38 54,26 64,22 M58,30 C62,30 65,27 68,27 M50,34 C56,28 54,18 60,12" stroke-width="1.5"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage" id="stageEl">
+
+  <!-- AUTH -->
+  <div class="screen center" id="authScreen">
+    <svg class="mark" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17 1 L33 17 L17 33 L1 17 Z" stroke="#B08D4F" stroke-width="1"/>
+      <circle cx="17" cy="17" r="4" stroke="#B08D4F" stroke-width="1"/>
+    </svg>
+    <h1 class="title">De Afrekening</h1>
+    <p class="lede" id="authLede">Log in met je naam en wachtwoord.</p>
+
+    <div class="error" id="authError"></div>
+
+    <input type="text" id="nameInput" placeholder="Jouw naam" autocomplete="username">
+    <input type="password" id="passInput" placeholder="Wachtwoord" autocomplete="current-password">
+    <input type="text" id="codeInput" placeholder="Toegangscode" style="display:none">
+
+    <button class="btn" id="authBtn">INLOGGEN</button>
+    <div class="link-toggle" id="toggleModeWrap">
+      Nog geen account? <a id="toggleMode">Registreer</a>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quizScreen">
+    <div id="quiz"></div>
+  </div>
+
+  <!-- WAITING (submitted, not revealed yet) -->
+  <div class="screen center done" id="waitingScreen">
+    <div class="glyph-big"></div>
+    <p>Dankje voor je antwoorden. Tijdens het weekend zullen de resultaten onthuld worden.</p>
+  </div>
+
+  <!-- RESULT (revealed) -->
+  <div class="screen center" id="resultScreen">
+    <p class="lede" style="margin-bottom:6px;">Jouw huis is onthuld:</p>
+    <div class="reveal-house" id="resultHouse"></div>
+    <p class="lede" id="resultReasons" style="max-width:520px; font-style:italic;"></p>
+
+    <div class="map-wrap">
+      <svg class="map-svg" viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg">
+        <rect x="16" y="16" width="768" height="428" rx="8" fill="#171310" stroke="#6E5A34" stroke-width="2"/>
+        <rect x="26" y="26" width="748" height="408" rx="4" fill="none" stroke="#4a3d27" stroke-width="1"/>
+
+        <!-- kompasroos -->
+        <g transform="translate(699,75)" stroke="#B08D4F" fill="none" stroke-width="1.2">
+          <circle r="30"/>
+          <path d="M0,-30 L0,30 M-30,0 L30,0" />
+          <path d="M0,-30 L6,-14 L0,-18 L-6,-14 Z" fill="#B08D4F" stroke="none"/>
+          <text x="0" y="-36" text-anchor="middle" fill="#A79D87" font-size="9" font-family="Inter, sans-serif" stroke="none">N</text>
+        </g>
+
+        <!-- 4 territoria -->
+        <g id="territory-stark">
+          <polygon points="46,44 230,38 404,54 392,150 400,192 218,198 44,188 50,118" fill="#8FA9B0" opacity="0.16" stroke="#8FA9B0" stroke-width="1.5"/>
+          <use href="#crest-stark" x="179" y="66" width="58" height="70" color="#8FA9B0"/>
+          <text x="208" y="150" text-anchor="middle" fill="#8FA9B0" font-family="'Cormorant Garamond', serif" font-size="19" font-style="italic">Stark</text>
+        </g>
+
+        <g id="territory-lannister">
+          <polygon points="416,52 596,40 754,46 748,120 758,190 580,196 410,190 404,120" fill="#C6A15B" opacity="0.16" stroke="#C6A15B" stroke-width="1.5"/>
+          <use href="#crest-lannister" x="554" y="64" width="58" height="70" color="#C6A15B"/>
+          <text x="583" y="148" text-anchor="middle" fill="#C6A15B" font-family="'Cormorant Garamond', serif" font-size="19" font-style="italic">Lannister</text>
+        </g>
+
+        <g id="territory-targaryen">
+          <polygon points="44,208 220,202 396,212 402,286 394,362 216,368 46,360 40,282" fill="#B23A45" opacity="0.16" stroke="#B23A45" stroke-width="1.5"/>
+          <use href="#crest-targaryen" x="179" y="238" width="58" height="70" color="#B23A45"/>
+          <text x="208" y="322" text-anchor="middle" fill="#B23A45" font-family="'Cormorant Garamond', serif" font-size="19" font-style="italic">Targaryen</text>
+        </g>
+
+        <g id="territory-baratheon">
+          <polygon points="410,210 584,202 758,212 752,284 760,360 578,368 404,360 398,284" fill="#D4A017" opacity="0.16" stroke="#D4A017" stroke-width="1.5"/>
+          <use href="#crest-baratheon" x="554" y="238" width="58" height="70" color="#D4A017"/>
+          <text x="583" y="322" text-anchor="middle" fill="#D4A017" font-family="'Cormorant Garamond', serif" font-size="19" font-style="italic">Baratheon</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="banners" id="banners"></div>
+  </div>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let mode = 'login'; // 'login' | 'register'
+let questions = [];
+let current = 0;
+const answers = {};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+  $('stageEl').classList.toggle('wide', id === 'resultScreen');
+}
+
+async function api(path, options){
+  const res = await fetch(path, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data.error || 'Er ging iets mis.');
+  return data;
+}
+
+function toggleAuthMode(){
+  mode = mode === 'login' ? 'register' : 'login';
+  $('authError').textContent = '';
+  if(mode === 'register'){
+    $('authLede').textContent = 'Registreer met je naam, een wachtwoord en de toegangscode.';
+    $('codeInput').style.display = 'block';
+    $('authBtn').textContent = 'REGISTREREN';
+    $('toggleModeWrap').innerHTML = 'Al een account? <a id="toggleMode">Inloggen</a>';
+  } else {
+    $('authLede').textContent = 'Log in met je naam en wachtwoord.';
+    $('codeInput').style.display = 'none';
+    $('authBtn').textContent = 'INLOGGEN';
+    $('toggleModeWrap').innerHTML = 'Nog geen account? <a id="toggleMode">Registreer</a>';
+  }
+}
+$('toggleModeWrap').addEventListener('click', (e) => {
+  if(e.target && e.target.id === 'toggleMode') toggleAuthMode();
+});
+
+$('authBtn').addEventListener('click', async () => {
+  $('authError').textContent = '';
+  const name = $('nameInput').value.trim();
+  const password = $('passInput').value;
+  try {
+    if(mode === 'register'){
+      const accessCode = $('codeInput').value.trim();
+      await api('/api/register', { method: 'POST', body: JSON.stringify({ name, password, accessCode }) });
+    } else {
+      await api('/api/login', { method: 'POST', body: JSON.stringify({ name, password }) });
+    }
+    await boot();
+  } catch(err){
+    $('authError').textContent = err.message;
+  }
+});
+
+async function boot(){
+  let me;
+  try {
+    me = await api('/api/me');
+  } catch(err){
+    showScreen('authScreen');
+    return;
+  }
+
+  if(!me.hasSubmitted){
+    const q = await api('/api/questions');
+    questions = q.questions;
+    showScreen('quizScreen');
+    renderQuestion();
+    return;
+  }
+
+  if(me.revealed && me.house){
+    $('resultHouse').textContent = me.house.name;
+    $('resultHouse').style.color = me.house.color;
+    $('resultReasons').textContent = (me.reasons && me.reasons.length)
+      ? `Waarom? Je ${me.reasons.join('; ')}.`
+      : '';
+    await renderBanners(me.house.key);
+    showScreen('resultScreen');
+  } else {
+    showScreen('waitingScreen');
+  }
+}
+
+const HOUSE_META = {
+  stark: { name: 'Stark', color: '#8FA9B0', icon: 'crest-stark' },
+  lannister: { name: 'Lannister', color: '#C6A15B', icon: 'crest-lannister' },
+  targaryen: { name: 'Targaryen', color: '#B23A45', icon: 'crest-targaryen' },
+  baratheon: { name: 'Baratheon', color: '#D4A017', icon: 'crest-baratheon' },
+};
+const HOUSE_ORDER = ['stark', 'lannister', 'targaryen', 'baratheon'];
+
+async function renderBanners(ownHouseKey){
+  let houses;
+  try {
+    const data = await api('/api/reveal');
+    houses = data.houses;
+  } catch(err){
+    $('banners').innerHTML = '';
+    return;
+  }
+
+  $('banners').innerHTML = HOUSE_ORDER.map(key => {
+    const meta = HOUSE_META[key];
+    const members = houses[key] || [];
+    const isOwn = key === ownHouseKey;
+    const membersHtml = members.length
+      ? members.map(n => `<div class="banner-member">${n}</div>`).join('')
+      : '<div class="banner-member banner-empty">—</div>';
+    return `
+      <div class="banner${isOwn ? ' own' : ''}" style="--house-color:${meta.color}">
+        ${isOwn ? '<div class="banner-tag">DIT BEN JIJ</div>' : ''}
+        <svg class="banner-icon" viewBox="0 0 80 96"><use href="#${meta.icon}"/></svg>
+        <div class="banner-name">${meta.name}</div>
+        <div class="banner-members">${membersHtml}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTicks(){
+  let ticks = '';
+  for(let i=0; i<questions.length; i++){
+    let cls = 'tick';
+    if(i < current) cls += ' done';
+    if(i === current) cls += ' current';
+    ticks += `<div class="${cls}"></div>`;
+  }
+  return ticks;
+}
+
+function renderQuestion(){
+  const q = questions[current];
+  const quizEl = $('quiz');
+
+  if(q.type === 'open'){
+    quizEl.innerHTML = `
+      <div class="q-count">${current + 1} VAN ${questions.length}</div>
+      <p class="q-text">${q.text}</p>
+      <div class="open-wrap">
+        <textarea class="open-input" id="openField" placeholder="Typ je antwoord…"></textarea>
+        <button class="open-submit" id="openSubmitBtn">VOLGENDE</button>
+      </div>
+      <div class="progress">${renderTicks()}</div>
+    `;
+    $('openField').focus();
+    $('openSubmitBtn').addEventListener('click', answerOpen);
+    return;
+  }
+
+  let opts = '';
+  q.opts.forEach((t, i) => {
+    opts += `<button class="opt" data-idx="${i}"><span class="glyph"></span><span>${t}</span></button>`;
+  });
+
+  quizEl.innerHTML = `
+    <div class="q-count">${current + 1} VAN ${questions.length}</div>
+    <p class="q-text">${q.text}</p>
+    <div class="options">${opts}</div>
+    <div class="progress">${renderTicks()}</div>
+  `;
+  quizEl.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => answerMc(q.opts[Number(btn.dataset.idx)]));
+  });
+}
+
+function advance(){
+  current++;
+  if(current < questions.length){
+    renderQuestion();
+  } else {
+    submitAnswers();
+  }
+}
+
+function answerMc(text){
+  answers[questions[current].key] = text;
+  advance();
+}
+
+function answerOpen(){
+  const val = $('openField').value.trim();
+  answers[questions[current].key] = val;
+  advance();
+}
+
+async function submitAnswers(){
+  $('quiz').innerHTML = '<p class="lede">Even geduld…</p>';
+  try {
+    await api('/api/submit', { method: 'POST', body: JSON.stringify({ answers }) });
+    showScreen('waitingScreen');
+  } catch(err){
+    if(err.message === 'Je hebt al geantwoord.'){
+      // De inzending was al gelukt (bv. na een dubbelklik) - gewoon doorgaan naar het wachtscherm.
+      await boot();
+      return;
+    }
+    if(err.message === 'Niet ingelogd.'){
+      // Sessie is verlopen (bv. server herstart) - opnieuw inloggen is de enige weg terug.
+      $('quiz').innerHTML = `
+        <p class="error">Je sessie is verlopen. Log opnieuw in en vul de vragenlijst opnieuw in — je antwoorden van net zijn niet opgeslagen.</p>
+        <button class="btn" id="reloginBtn">OPNIEUW INLOGGEN</button>
+      `;
+      $('reloginBtn').addEventListener('click', () => location.reload());
+      return;
+    }
+    const message = err.message === 'Failed to fetch'
+      ? 'Kon geen verbinding maken met de server. Controleer je internetverbinding en probeer opnieuw.'
+      : err.message;
+    $('quiz').innerHTML = `
+      <p class="error">${message}</p>
+      <button class="btn" id="retrySubmitBtn">OPNIEUW PROBEREN</button>
+    `;
+    $('retrySubmitBtn').addEventListener('click', submitAnswers);
+  }
+}
+
+boot();
+</script>
+
+</body>
+</html>
