@@ -241,6 +241,25 @@ app.post('/api/admin/analyze', requireAdmin, (req, res) => {
   backgroundBackup();
 });
 
+app.post('/api/admin/reset', requireAdmin, (req, res) => {
+  const { userIds } = req.body || {};
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    return res.status(400).json({ error: 'Geen personen geselecteerd.' });
+  }
+
+  const reset = [];
+  for (const rawId of userIds) {
+    const userId = Number(rawId);
+    const info = db
+      .prepare('UPDATE submissions SET scores_json = NULL, house = NULL, reasons_json = NULL WHERE user_id = ?')
+      .run(userId);
+    if (info.changes > 0) reset.push(userId);
+  }
+
+  res.json({ ok: true, reset });
+  backgroundBackup();
+});
+
 app.use((err, req, res, next) => {
   console.error('Onverwachte fout:', err);
   res.status(500).json({ error: 'Er ging iets mis. Probeer opnieuw.' });
