@@ -260,6 +260,23 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
   backgroundBackup();
 });
 
+app.post('/api/admin/delete-submission', requireAdmin, (req, res) => {
+  const { userIds } = req.body || {};
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    return res.status(400).json({ error: 'Geen personen geselecteerd.' });
+  }
+
+  const deleted = [];
+  for (const rawId of userIds) {
+    const userId = Number(rawId);
+    const info = db.prepare('DELETE FROM submissions WHERE user_id = ?').run(userId);
+    if (info.changes > 0) deleted.push(userId);
+  }
+
+  res.json({ ok: true, deleted });
+  backgroundBackup();
+});
+
 app.use((err, req, res, next) => {
   console.error('Onverwachte fout:', err);
   res.status(500).json({ error: 'Er ging iets mis. Probeer opnieuw.' });

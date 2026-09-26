@@ -22,6 +22,7 @@
     <div class="admin-actions">
       <button class="admin-btn" id="analyzeBtn" disabled>ANALYSEER GESELECTEERDEN (0)</button>
       <button class="admin-btn danger" id="resetBtn" disabled>RESET GESELECTEERDEN (0)</button>
+      <button class="admin-btn danger" id="deleteBtn" disabled>VERWIJDER GESELECTEERDEN (0)</button>
       <button class="admin-btn" id="revealBtn">ONTHULLEN</button>
       <button class="admin-btn" id="refreshBtn">VERVERSEN</button>
       <a class="admin-btn" id="backupBtn" href="/api/admin/backup" style="text-decoration:none; display:inline-block;">BACKUP DOWNLOADEN</a>
@@ -72,6 +73,8 @@ function updateAnalyzeBtn(){
   $('analyzeBtn').disabled = selected.size === 0;
   $('resetBtn').textContent = `RESET GESELECTEERDEN (${selected.size})`;
   $('resetBtn').disabled = selected.size === 0;
+  $('deleteBtn').textContent = `VERWIJDER GESELECTEERDEN (${selected.size})`;
+  $('deleteBtn').disabled = selected.size === 0;
 }
 
 $('analyzeBtn').addEventListener('click', async () => {
@@ -100,6 +103,20 @@ $('resetBtn').addEventListener('click', async () => {
     updateAnalyzeBtn();
   }
 });
+$('deleteBtn').addEventListener('click', async () => {
+  if(selected.size === 0) return;
+  if(!confirm(`Zending(en) van ${selected.size} persoon/personen volledig verwijderen? De antwoorden zijn dan definitief weg (het account blijft bestaan, ze kunnen opnieuw invullen).`)) return;
+  $('deleteBtn').disabled = true;
+  try {
+    await api('/api/admin/delete-submission', { method: 'POST', body: JSON.stringify({ userIds: [...selected] }) });
+    selected.clear();
+    await loadRoster();
+  } catch(err){
+    alert(err.message);
+    updateAnalyzeBtn();
+  }
+});
+
 $('logoutBtn').addEventListener('click', async () => {
   await api('/api/admin/logout', { method: 'POST' });
   location.reload();
