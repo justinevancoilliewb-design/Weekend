@@ -177,6 +177,12 @@ let questions = [];
 let current = 0;
 const answers = {};
 
+function joinReasons(reasons){
+  if(reasons.length === 0) return '';
+  if(reasons.length === 1) return reasons[0];
+  return reasons.slice(0, -1).join(', ') + ' en ' + reasons[reasons.length - 1];
+}
+
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
@@ -251,7 +257,7 @@ async function boot(){
     $('resultHouse').textContent = me.house.name;
     $('resultHouse').style.color = me.house.color;
     $('resultReasons').textContent = (me.reasons && me.reasons.length)
-      ? `Waarom? Je ${me.reasons.join('; ')}.`
+      ? `Je bent een ${me.house.name} omdat je ${joinReasons(me.reasons)}.`
       : '';
     await renderBanners(me.house.key);
     showScreen('resultScreen');

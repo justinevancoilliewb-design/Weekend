@@ -40,6 +40,12 @@ const HOUSE_ORDER = ['stark','lannister','targaryen','baratheon'];
 let revealed = false;
 const selected = new Set();
 
+function joinReasons(reasons){
+  if(reasons.length === 0) return '';
+  if(reasons.length === 1) return reasons[0];
+  return reasons.slice(0, -1).join(', ') + ' en ' + reasons[reasons.length - 1];
+}
+
 async function api(path, options){
   const res = await fetch(path, {
     method: 'GET',
@@ -195,7 +201,7 @@ async function loadRoster(){
     }
 
     const reasonHtml = (r.isAnalyzed && r.reasons && r.reasons.length)
-      ? `<div class="rreason">Waarom ${hm.name}: ${r.reasons.join('; ')}.</div>`
+      ? `<div class="rreason">${r.name} is een ${hm.name} omdat die ${joinReasons(r.reasons)}.</div>`
       : '';
 
     rows += `

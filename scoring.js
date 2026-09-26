@@ -81,16 +81,73 @@ const OPEN_KEYWORDS = {
   },
 };
 
-const QUESTION_LABELS = {
-  meeuwen: 'de meeuwenvraag',
-  friet: 'de frietjesvraag',
-  feestdag: 'de feestdagvraag',
-  pinten_vrijdag: 'de vrijdagpinten-vraag',
-  festival: 'de festivalvraag',
-  schoenen: 'de schoenenvraag',
-  gever_nemer: 'de gever/nemer-vraag',
-  sport_verbannen: 'de sportvraag',
-  weekend_plek: 'de weekend-vraag',
+// Vaste karaktereigenschap-zin per (vraag, huis) - nooit een verwijzing naar
+// de vraag zelf of het letterlijke antwoord, enkel het onderliggende trekje.
+// Wordt hergebruikt voor zowel trefwoord-signalen als (waar van toepassing)
+// numerieke signalen op dezelfde vraag.
+const TRAITS = {
+  meeuwen: {
+    stark: 'rekent op steun van vrienden in moeilijke momenten',
+    lannister: 'denkt eerst na over tactiek voor die in actie komt',
+    targaryen: 'denkt in oneindige, legendarische termen',
+    baratheon: 'twijfelt geen seconde aan het eigen kunnen',
+  },
+  friet: {
+    stark: 'houdt vast aan vertrouwde gewoontes',
+    lannister: 'kiest altijd voor het duurste en beste',
+    targaryen: 'trekt naar het vreemde en onontgonnen',
+    baratheon: 'gaat voor overdaad zonder er bij na te denken',
+  },
+  feestdag: {
+    stark: 'zet familie en traditie op de eerste plaats',
+    lannister: 'wil vooral indruk maken en winnen',
+    targaryen: 'laat de fantasie de vrije loop',
+    baratheon: 'kiest voor feest, actie en adrenaline',
+  },
+  pinten_vrijdag: {
+    stark: 'houdt zich liever op de vlakte',
+    lannister: 'houdt alles onder controle en berekent vooraf',
+    targaryen: 'kent geen grenzen',
+    baratheon: 'gaat voluit zonder rem',
+  },
+  festival: {
+    stark: 'geniet het meest in gezelschap van vrienden',
+    lannister: 'wil de exclusieve, VIP-behandeling',
+    targaryen: 'zoekt het unieke en alternatieve op',
+    baratheon: 'houdt van wild en onstuimig',
+  },
+  schoenen: {
+    stark: 'is spaarzaam en praktisch ingesteld',
+    lannister: 'investeert bewust in kwaliteit',
+    targaryen: 'denkt niet in beperkingen',
+    baratheon: 'geeft zonder terughoudendheid uit',
+  },
+  sport_verbannen: {
+    stark: 'heeft een streng rechtvaardigheidsgevoel',
+    lannister: 'kan niet tegen oneerlijk voordeel',
+    targaryen: 'verafschuwt het voorspelbare',
+    baratheon: 'kan geen geduld opbrengen voor traagheid',
+  },
+  weekend_plek: {
+    stark: 'is er altijd voor anderen',
+    lannister: 'regelt en organiseert alles tot in de puntjes',
+    targaryen: 'brengt originele, verrassende ideeën',
+    baratheon: 'brengt de sfeer en energie mee',
+  },
+};
+
+const TRAIT_MC = {
+  stark: 'geeft zonder er iets voor terug te verwachten',
+  lannister: 'denkt in wederdiensten op eigen voorwaarden',
+  targaryen: 'laat zich leiden door wat op dat moment het beste aanvoelt',
+  baratheon: 'neemt zonder schuldgevoel wat die nodig heeft',
+};
+
+const TRAIT_FALLBACK = {
+  stark: 'heeft een rustige, verbindende present',
+  lannister: 'straalt een berekende, strategische present uit',
+  targaryen: 'heeft iets grensverleggends over zich',
+  baratheon: 'brengt energie en lef mee',
 };
 
 function scoreAnswers(answersByKey) {
@@ -106,7 +163,7 @@ function scoreAnswers(answersByKey) {
   for (const q of QUESTIONS) {
     const raw = (answersByKey[q.key] || '').toString();
     rawTexts.push(raw);
-    const label = QUESTION_LABELS[q.key] || q.key;
+    const trait = TRAITS[q.key] || {};
 
     if (q.type === 'open') {
       const text = raw.toLowerCase();
@@ -115,8 +172,8 @@ function scoreAnswers(answersByKey) {
         for (const house of Object.keys(bank)) {
           for (const word of bank[house]) {
             const hits = text.split(word).length - 1;
-            if (hits > 0) {
-              addSignal(house, hits * 4, `gebruikte het woord "${word}" bij ${label}`);
+            if (hits > 0 && trait[house]) {
+              addSignal(house, hits * 4, trait[house]);
             }
           }
         }
@@ -126,16 +183,16 @@ function scoreAnswers(answersByKey) {
         const hasEpicWord = /oneindig|onendelijk|altijd|god|onsterfelijk/.test(text);
         const numMatch = text.match(/\d+/);
         if (hasEpicWord) {
-          addSignal('targaryen', 10, `gaf bij ${label} een legendarisch/oneindig antwoord`);
+          addSignal('targaryen', 10, trait.targaryen);
         } else if (numMatch) {
           const n = parseInt(numMatch[0], 10);
           if (n >= 50) {
-            addSignal('baratheon', 8, `noemde bij ${label} een erg hoog aantal (${n})`);
-            addSignal('targaryen', 3, `noemde bij ${label} een erg hoog aantal (${n})`);
+            addSignal('baratheon', 8, trait.baratheon);
+            addSignal('targaryen', 3, trait.targaryen);
           } else if (n >= 10) {
-            addSignal('lannister', 6, `noemde bij ${label} een berekend, gemiddeld aantal (${n})`);
+            addSignal('lannister', 6, trait.lannister);
           } else {
-            addSignal('stark', 6, `hield het bij ${label} bescheiden (${n})`);
+            addSignal('stark', 6, trait.stark);
           }
         }
       }
@@ -144,16 +201,16 @@ function scoreAnswers(answersByKey) {
         const hasEpicWord = /oneindig|onendelijk|altijd|geen limiet/.test(text);
         const numMatch = text.match(/\d+/);
         if (hasEpicWord) {
-          addSignal('targaryen', 10, `gaf bij ${label} een grenzeloos antwoord`);
+          addSignal('targaryen', 10, trait.targaryen);
         } else if (numMatch) {
           const n = parseInt(numMatch[0], 10);
           if (n <= 3) {
-            addSignal('stark', 6, `bleef bij ${label} bescheiden (${n})`);
+            addSignal('stark', 6, trait.stark);
           } else if (n <= 6) {
-            addSignal('lannister', 6, `gaf bij ${label} een berekend aantal (${n})`);
+            addSignal('lannister', 6, trait.lannister);
           } else {
-            addSignal('baratheon', 8, `gaf bij ${label} een hoog aantal (${n})`);
-            addSignal('targaryen', 3, `gaf bij ${label} een hoog aantal (${n})`);
+            addSignal('baratheon', 8, trait.baratheon);
+            addSignal('targaryen', 3, trait.targaryen);
           }
         }
       }
@@ -162,16 +219,16 @@ function scoreAnswers(answersByKey) {
         const hasEpicWord = /onbeperkt|geen limiet|prijs maakt niet uit|alles/.test(text);
         const numMatch = text.match(/\d+/);
         if (hasEpicWord) {
-          addSignal('targaryen', 10, `gaf bij ${label} een onbeperkt bedrag op`);
+          addSignal('targaryen', 10, trait.targaryen);
         } else if (numMatch) {
           const n = parseInt(numMatch[0], 10);
           if (n <= 100) {
-            addSignal('stark', 6, `gaf bij ${label} een spaarzaam bedrag op (${n})`);
+            addSignal('stark', 6, trait.stark);
           } else if (n <= 300) {
-            addSignal('lannister', 6, `gaf bij ${label} een fors bedrag op (${n})`);
+            addSignal('lannister', 6, trait.lannister);
           } else {
-            addSignal('baratheon', 8, `gaf bij ${label} een zeer hoog bedrag op (${n})`);
-            addSignal('targaryen', 3, `gaf bij ${label} een zeer hoog bedrag op (${n})`);
+            addSignal('baratheon', 8, trait.baratheon);
+            addSignal('targaryen', 3, trait.targaryen);
           }
         }
       }
@@ -179,7 +236,7 @@ function scoreAnswers(answersByKey) {
 
     if (q.type === 'mc') {
       const chosen = q.opts.find((o) => o.t === raw);
-      if (chosen) addSignal(chosen.h, 12, `koos bij ${label} voor "${raw}"`);
+      if (chosen) addSignal(chosen.h, 12, TRAIT_MC[chosen.h]);
     }
   }
 
@@ -189,13 +246,19 @@ function scoreAnswers(answersByKey) {
     hash = (hash * 31 + allText.charCodeAt(i)) % 9973;
   }
   const hashHouse = HOUSE_ORDER[hash % 4];
-  addSignal(hashHouse, 1, 'de algemene toon van je antwoorden');
+  addSignal(hashHouse, 1, TRAIT_FALLBACK[hashHouse]);
 
   const winner = HOUSE_ORDER.reduce((a, b) => (scores[a] >= scores[b] ? a : b));
 
+  const seenText = new Set();
   const reasons = signals
     .filter((s) => s.house === winner)
     .sort((a, b) => b.weight - a.weight)
+    .filter((s) => {
+      if (seenText.has(s.text)) return false;
+      seenText.add(s.text);
+      return true;
+    })
     .slice(0, 3)
     .map((s) => s.text);
 
