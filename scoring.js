@@ -10,23 +10,14 @@ const HOUSE_ORDER = ['stark', 'lannister', 'targaryen', 'baratheon'];
 
 const QUESTIONS = [
   { key: 'meeuwen', type: 'open', text: 'In een gevecht tot de dood, tegen hoeveel meeuwen zou jij het kunnen opnemen en winnen?' },
-  { key: 'friet', type: 'open', text: 'Je mag een jaar gratis bestellen bij je stamfrituur, maar je mag maar één bestelling plaatsen. Wat bestel je?' },
-  { key: 'feestdag', type: 'open', text: 'Je moet een nieuwe feestdag uitvinden die nog nooit gevierd is. Waar draait die dag om?' },
+  { key: 'ladies', type: 'open', text: 'Welke twee ladies mogen uw trio vervolledigen?' },
+  { key: 'onzichtbaar', type: 'open', text: 'Wat zou je doen mocht je voor 24 uur onzichtbaar kunnen zijn zonder dat iemand het weet?' },
   { key: 'pinten_vrijdag', type: 'open', text: 'Hoeveel pinten drink je gemiddeld op een vrijdag?' },
   { key: 'festival', type: 'open', text: 'Je mag één festival volledig gratis en voor niks beleven. Welk festival kies je?' },
   { key: 'schoenen', type: 'open', text: 'Hoeveel geld zou je maximaal uitgeven aan nieuwe schoenen?' },
-  {
-    key: 'gever_nemer',
-    type: 'mc',
-    text: 'Ben je een gever of een nemer?',
-    opts: [
-      { t: 'Een gever, altijd — ook als het me zelf iets kost.', h: 'stark' },
-      { t: 'Een nemer, maar ik zorg dat ik ooit iets terugdoe op mijn eigen voorwaarden.', h: 'lannister' },
-      { t: 'Geen van beide — ik doe gewoon wat op dat moment het meest logisch aanvoelt.', h: 'targaryen' },
-      { t: 'Een nemer, zonder schuldgevoel.', h: 'baratheon' },
-    ],
-  },
-  { key: 'sport_verbannen', type: 'open', text: 'Welke sport zou je willen verbannen uit de wereld?' },
+  { key: 'koosnaampje', type: 'open', text: 'Wat is het koosnaampje van je huidige vriendin / laatste ex?' },
+  { key: 'pdc_bijnaam', type: 'open', text: 'Wat zou uw liedje zijn bij de opkomst van de PDC World Darts Championship en welke vlammende bijnaam zou je jezelf geven?' },
+  { key: 'coinflip', type: 'open', text: 'Coin flip: win 1000 euro of verlies 500 euro. Hoeveel coin flips doe je?' },
   { key: 'weekend_plek', type: 'open', text: 'Geef een reden waarom jij een plek verdiend hebt op het weekend.' },
 ];
 
@@ -37,17 +28,17 @@ const OPEN_KEYWORDS = {
     targaryen: ['oneindig', 'onendelijk', 'legende', 'altijd', 'god', 'onsterfelijk', 'meeuw word'],
     baratheon: ['allemaal', 'alles', 'zonder twijfel', 'makkelijk', 'moeiteloos', 'gemakkelijk'],
   },
-  friet: {
-    stark: ['hetzelfde', 'vaste', 'zoals altijd', 'gewoontegetrouw', 'standaard'],
-    lannister: ['duur', 'duurste', 'beste', 'exclusief', 'waard'],
-    targaryen: ['nooit besteld', 'nieuw', 'vreemd', 'origineel', 'gek', 'verzin'],
-    baratheon: ['mega', 'extra groot', 'alles erop', 'reuze', 'dubbel', 'overheerlijk veel'],
+  ladies: {
+    stark: ['mijn vriendin', 'niemand', 'geen', 'trouw', 'ik hou het bij', 'enkel'],
+    lannister: ['beroemd', 'rijk', 'voordeel', 'slim', 'strategisch', 'carrière'],
+    targaryen: ['onmogelijk', 'droom', 'legende', 'fantasie', 'onbestaand', 'uniek'],
+    baratheon: ['alle', 'iedereen', 'nog meer', 'zoveel mogelijk', 'feest', 'wild'],
   },
-  feestdag: {
-    stark: ['samen', 'familie', 'waarder', 'traditie', 'dankbaar', 'thuis'],
-    lannister: ['prestige', 'competitie', 'winnen', 'verdienen', 'beste', 'succes'],
-    targaryen: ['kunst', 'surreal', 'verbeelding', 'nooit gedaan', 'droom', 'fantasie'],
-    baratheon: ['feest', 'actie', 'adrenaline', 'plezier', 'drank', 'dansen'],
+  onzichtbaar: {
+    stark: ['helpen', 'bescherm', 'familie', 'checken', 'zorgen', 'vrienden'],
+    lannister: ['geld', 'spioneren', 'voordeel', 'informatie', 'plan', 'profiteren'],
+    targaryen: ['surreal', 'kunst', 'experimenteren', 'gek', 'avontuur', 'grenzen'],
+    baratheon: ['grappen', 'pranken', 'chaos', 'stiekem', 'spannend', 'adrenaline'],
   },
   pinten_vrijdag: {
     stark: ['weinig', 'rustig', 'niet te veel', 'verantwoord', 'paar', 'mate'],
@@ -67,11 +58,17 @@ const OPEN_KEYWORDS = {
     targaryen: ['onbeperkt', 'geen limiet', 'alles', 'droom', 'uniek paar'],
     baratheon: ['veel', 'duur', 'zoveel mogelijk', 'niet aan denken', 'gewoon kopen'],
   },
-  sport_verbannen: {
-    stark: ['gevaarlijk', 'onveilig', 'onrechtvaardig', 'oneerlijk', 'pijn', 'kwetsuur'],
-    lannister: ['cheat', 'vals', 'corrupt', 'geld', 'doping', 'oneerlijk voordeel', 'gekocht'],
-    targaryen: ['voorspelbaar', 'cliché', 'geen verbeelding', 'standaard', 'kunstloos'],
-    baratheon: ['traag', 'langzaam', 'niets gebeurt', 'slaapverwekkend', 'te rustig'],
+  koosnaampje: {
+    stark: ['schat', 'liefje', 'lief', 'thuis', 'maatje'],
+    lannister: ['baas', 'koningin', 'koning', 'prinses', 'topper'],
+    targaryen: ['uniek', 'gek', 'vreemd', 'bijzonder', 'mysterieus'],
+    baratheon: ['grappig', 'plaag', 'bully', 'kampioen', 'beest'],
+  },
+  pdc_bijnaam: {
+    stark: ['familie', 'team', 'samen', 'thuis', 'trouw'],
+    lannister: ['koning', 'kampioen', 'winnaar', 'beste', 'klasse'],
+    targaryen: ['vuur', 'legende', 'uniek', 'gek', 'anders'],
+    baratheon: ['beest', 'wild', 'hard', 'knaller', 'bruut', 'vlammend'],
   },
   weekend_plek: {
     stark: ['zorg', 'altijd er', 'betrouwbaar', 'help', 'iedereen', 'er voor anderen'],
@@ -92,17 +89,17 @@ const TRAITS = {
     targaryen: 'denkt in oneindige, legendarische termen',
     baratheon: 'twijfelt geen seconde aan het eigen kunnen',
   },
-  friet: {
-    stark: 'houdt vast aan vertrouwde gewoontes',
-    lannister: 'kiest altijd voor het duurste en beste',
-    targaryen: 'trekt naar het vreemde en onontgonnen',
-    baratheon: 'gaat voor overdaad zonder er bij na te denken',
+  ladies: {
+    stark: 'blijft trouw aan wie die al heeft',
+    lannister: 'kiest strategisch voor het eigen voordeel',
+    targaryen: 'droomt in onmogelijke, grootse scenario’s',
+    baratheon: 'wil gewoon zoveel mogelijk tegelijk',
   },
-  feestdag: {
-    stark: 'zet familie en traditie op de eerste plaats',
-    lannister: 'wil vooral indruk maken en winnen',
-    targaryen: 'laat de fantasie de vrije loop',
-    baratheon: 'kiest voor feest, actie en adrenaline',
+  onzichtbaar: {
+    stark: 'gebruikt macht het liefst om anderen te beschermen',
+    lannister: 'ziet meteen de kansen voor zichzelf',
+    targaryen: 'zoekt de grenzen van het surreal op',
+    baratheon: 'kan de verleiding tot chaos niet weerstaan',
   },
   pinten_vrijdag: {
     stark: 'houdt zich liever op de vlakte',
@@ -122,11 +119,23 @@ const TRAITS = {
     targaryen: 'denkt niet in beperkingen',
     baratheon: 'geeft zonder terughoudendheid uit',
   },
-  sport_verbannen: {
-    stark: 'heeft een streng rechtvaardigheidsgevoel',
-    lannister: 'kan niet tegen oneerlijk voordeel',
-    targaryen: 'verafschuwt het voorspelbare',
-    baratheon: 'kan geen geduld opbrengen voor traagheid',
+  koosnaampje: {
+    stark: 'is warm en zorgzaam in de liefde',
+    lannister: 'houdt van status, ook in de liefde',
+    targaryen: 'kiest altijd het ongewone',
+    baratheon: 'plaagt wie die graag ziet',
+  },
+  pdc_bijnaam: {
+    stark: 'speelt het liefst voor het team',
+    lannister: 'wil gewoon de beste zijn',
+    targaryen: 'kiest voor het unieke en onverwachte',
+    baratheon: 'brengt pure bravoure mee',
+  },
+  coinflip: {
+    stark: 'neemt liever geen onnodig risico',
+    lannister: 'rekent de kansen rustig uit',
+    targaryen: 'kent geen grenzen',
+    baratheon: 'gaat voluit zonder rem',
   },
   weekend_plek: {
     stark: 'is er altijd voor anderen',
@@ -134,13 +143,6 @@ const TRAITS = {
     targaryen: 'brengt originele, verrassende ideeën',
     baratheon: 'brengt de sfeer en energie mee',
   },
-};
-
-const TRAIT_MC = {
-  stark: 'geeft zonder er iets voor terug te verwachten',
-  lannister: 'denkt in wederdiensten op eigen voorwaarden',
-  targaryen: 'laat zich leiden door wat op dat moment het beste aanvoelt',
-  baratheon: 'neemt zonder schuldgevoel wat die nodig heeft',
 };
 
 const TRAIT_FALLBACK = {
@@ -232,11 +234,24 @@ function scoreAnswers(answersByKey) {
           }
         }
       }
-    }
 
-    if (q.type === 'mc') {
-      const chosen = q.opts.find((o) => o.t === raw);
-      if (chosen) addSignal(chosen.h, 12, TRAIT_MC[chosen.h]);
+      if (q.key === 'coinflip') {
+        const hasEpicWord = /oneindig|onendelijk|altijd|geen limiet|zoveel mogelijk/.test(text);
+        const numMatch = text.match(/\d+/);
+        if (hasEpicWord) {
+          addSignal('targaryen', 10, trait.targaryen);
+        } else if (numMatch) {
+          const n = parseInt(numMatch[0], 10);
+          if (n <= 1) {
+            addSignal('stark', 6, trait.stark);
+          } else if (n <= 5) {
+            addSignal('lannister', 6, trait.lannister);
+          } else {
+            addSignal('baratheon', 8, trait.baratheon);
+            addSignal('targaryen', 3, trait.targaryen);
+          }
+        }
+      }
     }
   }
 
