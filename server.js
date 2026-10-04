@@ -20,7 +20,7 @@ async function main() {
   await restoreDbIfMissing();
 
   const { db, getSetting, setSetting } = require('./db');
-  const { QUESTIONS, HOUSE_META, scoreAnswers } = require('./scoring');
+  const { QUESTIONS, HOUSE_META, scoreAnswers, reasonsForHouse, balanceAssignments } = require('./scoring');
 
   const app = express();
 app.use(express.json());
@@ -219,18 +219,42 @@ app.post('/api/admin/analyze', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Geen personen geselecteerd.' });
   }
 
-  const analyzed = [];
-  for (const rawId of userIds) {
-    const userId = Number(rawId);
+  const ids = userIds.map(Number);
+  const scoresByUserId = new Map();
+  const signalsByUserId = new Map();
+
+  for (const userId of ids) {
     const submission = db.prepare('SELECT answers_json FROM submissions WHERE user_id = ?').get(userId);
     if (!submission) continue;
-
     const answersByKey = JSON.parse(submission.answers_json);
-    const { scores, winner, reasons } = scoreAnswers(answersByKey);
+    const { scores, signals } = scoreAnswers(answersByKey);
+    scoresByUserId.set(userId, scores);
+    signalsByUserId.set(userId, signals);
+  }
 
+  if (scoresByUserId.size === 0) {
+    return res.json({ ok: true, analyzed: [] });
+  }
+
+  // Huidige verdeling van reeds geanalyseerde personen die NIET in deze
+  // batch zitten, zodat de nieuwe toewijzingen de totale verdeling
+  // gelijk houden in plaats van enkel binnen deze batch.
+  const placeholders = ids.map(() => '?').join(',');
+  const existingRows = db
+    .prepare(`SELECT house, COUNT(*) as n FROM submissions WHERE house IS NOT NULL AND user_id NOT IN (${placeholders}) GROUP BY house`)
+    .all(...ids);
+  const existingCounts = {};
+  for (const row of existingRows) existingCounts[row.house] = row.n;
+
+  const assignments = balanceAssignments(scoresByUserId, existingCounts);
+
+  const analyzed = [];
+  for (const [userId, house] of assignments) {
+    const scores = scoresByUserId.get(userId);
+    const reasons = reasonsForHouse(signalsByUserId.get(userId), house);
     db.prepare('UPDATE submissions SET scores_json = ?, house = ?, reasons_json = ? WHERE user_id = ?').run(
       JSON.stringify(scores),
-      winner,
+      house,
       JSON.stringify(reasons),
       userId
     );

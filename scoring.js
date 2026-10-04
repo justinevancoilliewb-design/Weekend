@@ -263,11 +263,17 @@ function scoreAnswers(answersByKey) {
   const hashHouse = HOUSE_ORDER[hash % 4];
   addSignal(hashHouse, 1, TRAIT_FALLBACK[hashHouse]);
 
-  const winner = HOUSE_ORDER.reduce((a, b) => (scores[a] >= scores[b] ? a : b));
+  return { scores, signals };
+}
 
+// Geeft de top-3 (gededupliceerde) eigenschap-zinnen terug voor één specifiek
+// huis, op basis van de signalen die scoreAnswers() verzamelde. Losgekoppeld
+// van scoreAnswers() zelf omdat het uiteindelijk toegewezen huis (na
+// balanceAssignments) kan afwijken van het huis met de hoogste ruwe score.
+function reasonsForHouse(signals, house) {
   const seenText = new Set();
   const reasons = signals
-    .filter((s) => s.house === winner)
+    .filter((s) => s.house === house)
     .sort((a, b) => b.weight - a.weight)
     .filter((s) => {
       if (seenText.has(s.text)) return false;
@@ -277,7 +283,64 @@ function scoreAnswers(answersByKey) {
     .slice(0, 3)
     .map((s) => s.text);
 
-  return { scores, winner, reasons };
+  // Kan leeg uitkomen als iemand voor deze balans in een huis terechtkomt
+  // waar die van zichzelf geen signalen voor had - altijd minstens één
+  // generieke eigenschap-zin teruggeven zodat er nooit "geen uitleg" is.
+  return reasons.length > 0 ? reasons : [TRAIT_FALLBACK[house]];
 }
 
-module.exports = { QUESTIONS, HOUSE_META, HOUSE_ORDER, scoreAnswers };
+// Wijst elke persoon in `scoresByUserId` (Map<userId, scores>) toe aan een huis,
+// rekening houdend met `existingCounts` (huidige aantallen per huis van reeds
+// geanalyseerde personen die niet in deze batch zitten), zodat de totale
+// verdeling over de 4 huizen zo gelijk mogelijk blijft. Iedereen krijgt zoveel
+// mogelijk zijn/haar hoogst scorende huis, maar zodra een huis zijn eerlijke
+// aandeel bereikt, gaat de volgende persoon met de hoogste score voor dat huis
+// naar hun eerstvolgende beste huis dat nog ruimte heeft.
+function balanceAssignments(scoresByUserId, existingCounts) {
+  const counts = {};
+  for (const house of HOUSE_ORDER) counts[house] = existingCounts[house] || 0;
+
+  const totalAfter = HOUSE_ORDER.reduce((sum, h) => sum + counts[h], 0) + scoresByUserId.size;
+  const minShare = Math.floor(totalAfter / HOUSE_ORDER.length);
+  const maxShare = Math.ceil(totalAfter / HOUSE_ORDER.length);
+
+  const candidates = [];
+  for (const [userId, scores] of scoresByUserId) {
+    for (const house of HOUSE_ORDER) {
+      candidates.push({ userId, house, score: scores[house] });
+    }
+  }
+  candidates.sort((a, b) => b.score - a.score);
+
+  const assignments = new Map();
+  const remaining = new Set(scoresByUserId.keys());
+
+  const assignUpTo = (cap) => {
+    for (const c of candidates) {
+      if (!remaining.has(c.userId)) continue;
+      if (counts[c.house] >= cap) continue;
+      assignments.set(c.userId, c.house);
+      counts[c.house]++;
+      remaining.delete(c.userId);
+    }
+  };
+
+  // Eerste ronde: vul elk huis tot zijn minimale aandeel (het "vloer"-niveau),
+  // zodat geen enkel huis leeg/bijna-leeg kan blijven terwijl een ander huis
+  // al wel zijn deel heeft. Tweede ronde: verdeel de rest (het verschil
+  // tussen min- en maxShare) over de huizen met de hoogste resterende scores.
+  assignUpTo(minShare);
+  assignUpTo(maxShare);
+
+  // Vangnet: zou enkel nog overblijven bij gelijktijdige grenzen - plaats in
+  // het op dat moment minst volle huis.
+  for (const userId of remaining) {
+    const house = HOUSE_ORDER.reduce((a, b) => (counts[a] <= counts[b] ? a : b));
+    assignments.set(userId, house);
+    counts[house]++;
+  }
+
+  return assignments;
+}
+
+module.exports = { QUESTIONS, HOUSE_META, HOUSE_ORDER, scoreAnswers, reasonsForHouse, balanceAssignments };
