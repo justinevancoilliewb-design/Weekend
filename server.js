@@ -307,7 +307,7 @@ app.use((err, req, res, next) => {
 });
 
   app.listen(PORT, () => {
-    console.log(`De Afrekening draait op http://localhost:${PORT}`);
+    console.log(`De Eed van het Verbond draait op http://localhost:${PORT}`);
     console.log(`Toegangscode voor registratie: ${ACCESS_CODE}`);
     console.log(`Admin-wachtwoord: ${ADMIN_PASSWORD}`);
   });

@@ -1,6 +1,6 @@
-# De Afrekening — webapp
+# De Eed van het Verbond — webapp
 
-Multi-user versie van de vragenlijst: elke deelnemer registreert/logt in, vult de 10 vragen **eenmalig** in, en ziet daarna een neutrale wachtpagina. Niemand ziet zijn/haar huis (Stark / Lannister / Targaryen / Baratheon) totdat de organisator op "Onthullen" klikt in het admin-dashboard.
+Multi-user versie van de vragenlijst: elke deelnemer registreert/logt in, vult de 12 vragen **eenmalig** in, en ziet daarna een neutrale wachtpagina. Niemand ziet zijn/haar huis (Stark / Lannister / Targaryen / Baratheon) totdat de organisator op "Onthullen" klikt in het admin-dashboard.
 
 ## Starten
 

@@ -9,16 +9,18 @@ const HOUSE_META = {
 const HOUSE_ORDER = ['stark', 'lannister', 'targaryen', 'baratheon'];
 
 const QUESTIONS = [
-  { key: 'meeuwen', type: 'open', text: 'In een gevecht tot de dood, tegen hoeveel meeuwen zou jij het kunnen opnemen en winnen?' },
-  { key: 'ladies', type: 'open', text: 'Welke twee ladies mogen uw trio vervolledigen?' },
-  { key: 'onzichtbaar', type: 'open', text: 'Wat zou je doen mocht je voor 24 uur onzichtbaar kunnen zijn zonder dat iemand het weet?' },
-  { key: 'pinten_vrijdag', type: 'open', text: 'Hoeveel pinten drink je gemiddeld op een vrijdag?' },
-  { key: 'festival', type: 'open', text: 'Je mag één festival volledig gratis en voor niks beleven. Welk festival kies je?' },
-  { key: 'schoenen', type: 'open', text: 'Hoeveel geld zou je maximaal uitgeven aan nieuwe schoenen?' },
-  { key: 'koosnaampje', type: 'open', text: 'Wat is het koosnaampje van je huidige vriendin / laatste ex?' },
-  { key: 'pdc_bijnaam', type: 'open', text: 'Wat zou uw liedje zijn bij de opkomst van de PDC World Darts Championship en welke vlammende bijnaam zou je jezelf geven?' },
-  { key: 'coinflip', type: 'open', text: 'Coin flip: win 1000 euro of verlies 500 euro. Hoeveel coin flips doe je?' },
-  { key: 'weekend_plek', type: 'open', text: 'Geef een reden waarom jij een plek verdiend hebt op het weekend.' },
+  { key: 'meeuwen', type: 'open', text: 'Wanneer het tot een gevecht op leven en dood komt, tegen hoeveel meeuwen zoudt gij het opnemen en zegevieren?' },
+  { key: 'ladies', type: 'open', text: 'Welke twee edele vrouwen mogen uw driemanschap voltooien?' },
+  { key: 'onzichtbaar', type: 'open', text: 'Stel dat gij een dag en een nacht onzichtbaar waart, zonder dat een ziel het weet. Wat zoudt gij dan doen?' },
+  { key: 'pinten_vrijdag', type: 'open', text: 'Hoeveel pinten mede zoudt gij op een gewone vrijdag in de herberg ledigen?' },
+  { key: 'festival', type: 'open', text: 'De Koning schenkt u vrije toegang tot één feestmaal in het ganse rijk. Welk festival kiest gij?' },
+  { key: 'schoenen', type: 'open', text: 'Hoeveel goudstukken zoudt gij maximaal besteden aan een nieuw paar laarzen?' },
+  { key: 'koosnaampje', type: 'open', text: 'Met welke tedere naam spreekt gij uw huidige liefste of uw laatste verloofde aan?' },
+  { key: 'pdc_bijnaam', type: 'open', text: 'Bij uw intocht in de hal van het Wereldkampioenschap Pijlschieten, welk lied galmt door de zaal, en welke vlammende bijnaam draagt gij?' },
+  { key: 'studentenboek', type: 'open', text: 'Gij schrijft een kroniek over uw jaren als scholier aan de academie. Wat is de titel van dit boek?' },
+  { key: 'ideale_vrijgezelle', type: 'open', text: 'Hoe ziet het afscheidsfeest van uw vrijgezellenleven er in uw ideale verbeelding uit?' },
+  { key: 'levensles', type: 'open', text: 'Welke levensles geeft gij mee aan uw kleinzoon, wanneer gij als grijsaard bij het haardvuur zit?' },
+  { key: 'weekend_plek', type: 'open', text: 'Geef een reden waarom gij een stoel aan de tafel van het Verbond hebt verdiend.' },
 ];
 
 const OPEN_KEYWORDS = {
@@ -69,6 +71,24 @@ const OPEN_KEYWORDS = {
     lannister: ['koning', 'kampioen', 'winnaar', 'beste', 'klasse'],
     targaryen: ['vuur', 'legende', 'uniek', 'gek', 'anders'],
     baratheon: ['beest', 'wild', 'hard', 'knaller', 'bruut', 'vlammend'],
+  },
+  studentenboek: {
+    stark: ['vrienden', 'samen', 'thuis', 'kot', 'maatjes', 'herinneringen'],
+    lannister: ['diploma', 'carrière', 'slim', 'plan', 'cum laude', 'geslaagd', 'strategie'],
+    targaryen: ['legende', 'onmogelijk', 'vuur', 'unieke', 'epos', 'onwaarschijnlijk', 'mythe'],
+    baratheon: ['feest', 'kater', 'chaos', 'wild', 'zatte', 'dronken', 'pintjes', 'cantus'],
+  },
+  ideale_vrijgezelle: {
+    stark: ['gezellig', 'samen', 'vrienden', 'rustig', 'bbq', 'ontspannen', 'weekendje'],
+    lannister: ['luxe', 'vip', 'stijl', 'georganiseerd', 'cocktail', 'chique', 'goed geregeld'],
+    targaryen: ['uniek', 'gek', 'verrassing', 'avontuur', 'origineel', 'thema', 'onverwacht'],
+    baratheon: ['feest', 'wild', 'veel drank', 'zuipen', 'chaos', 'alles', 'tot laat', 'uit de bol'],
+  },
+  levensles: {
+    stark: ['familie', 'vrienden', 'eerlijk', 'trouw', 'respect', 'loyaal', 'zorg'],
+    lannister: ['geld', 'investeer', 'slim', 'plan', 'denk na', 'spaar', 'netwerk'],
+    targaryen: ['durf', 'droom', 'anders', 'jezelf', 'grenzen', 'volg je hart', 'uniek'],
+    baratheon: ['geniet', 'leef', 'feest', 'plezier', 'nu', 'neem alles', 'geen spijt'],
   },
   weekend_plek: {
     stark: ['zorg', 'altijd er', 'betrouwbaar', 'help', 'iedereen', 'er voor anderen'],
@@ -131,11 +151,23 @@ const TRAITS = {
     targaryen: 'kiest voor het unieke en onverwachte',
     baratheon: 'brengt pure bravoure mee',
   },
-  coinflip: {
-    stark: 'neemt liever geen onnodig risico',
-    lannister: 'rekent de kansen rustig uit',
-    targaryen: 'kent geen grenzen',
-    baratheon: 'gaat voluit zonder rem',
+  studentenboek: {
+    stark: 'koestert de band met vrienden uit het verleden',
+    lannister: 'ziet zelfs studeren als een stap in een groter plan',
+    targaryen: 'maakt van het eigen verhaal een legende',
+    baratheon: 'blikt terug op een leven vol feest en chaos',
+  },
+  ideale_vrijgezelle: {
+    stark: 'zoekt gezelligheid en een hechte groep',
+    lannister: 'kiest voor stijl, luxe en een goed georganiseerd feest',
+    targaryen: 'bedenkt iets origineels en onverwachts',
+    baratheon: 'wil een feest zonder rem',
+  },
+  levensles: {
+    stark: 'zet familie, vrienden en loyaliteit op de eerste plaats',
+    lannister: 'geeft slimme, berekende raad mee',
+    targaryen: 'moedigt aan om eigen grenzen te verleggen',
+    baratheon: 'leeft in het moment en geniet voluit',
   },
   weekend_plek: {
     stark: 'is er altijd voor anderen',
@@ -227,24 +259,6 @@ function scoreAnswers(answersByKey) {
           if (n <= 100) {
             addSignal('stark', 6, trait.stark);
           } else if (n <= 300) {
-            addSignal('lannister', 6, trait.lannister);
-          } else {
-            addSignal('baratheon', 8, trait.baratheon);
-            addSignal('targaryen', 3, trait.targaryen);
-          }
-        }
-      }
-
-      if (q.key === 'coinflip') {
-        const hasEpicWord = /oneindig|onendelijk|altijd|geen limiet|zoveel mogelijk/.test(text);
-        const numMatch = text.match(/\d+/);
-        if (hasEpicWord) {
-          addSignal('targaryen', 10, trait.targaryen);
-        } else if (numMatch) {
-          const n = parseInt(numMatch[0], 10);
-          if (n <= 1) {
-            addSignal('stark', 6, trait.stark);
-          } else if (n <= 5) {
             addSignal('lannister', 6, trait.lannister);
           } else {
             addSignal('baratheon', 8, trait.baratheon);
