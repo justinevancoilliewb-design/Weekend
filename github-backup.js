@@ -22,7 +22,7 @@ async function githubRequest(method, body) {
     headers: {
       Authorization: `Bearer ${TOKEN}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'de-afrekening-app',
+      'User-Agent': 'de-eed-van-het-verbond-app',
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,

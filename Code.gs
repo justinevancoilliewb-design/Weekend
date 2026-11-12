@@ -1,5 +1,5 @@
 /**
- * DE AFREKENING — scoringsscript voor Google Forms + Sheets
+ * DE EED VAN HET VERBOND — scoringsscript voor Google Forms + Sheets
  * ==========================================================
  * Plak dit volledige bestand in Extensions > Apps Script van de
  * Google Sheet die aan je Form gekoppeld is.
@@ -381,7 +381,7 @@ function dashboardHtml_(){
       .answers div{ font-size:12px; color:#A79D87; margin-bottom:4px; line-height:1.5; }
       .qlabel{ color:#B08D4F; font-style:italic; }
     </style></head><body>
-      <h2>Inzendingen &mdash; De Afrekening</h2>
+      <h2>Inzendingen &mdash; De Eed van het Verbond</h2>
       <div class="tally">${tally}</div>
       ${rows || '<p>Nog geen inzendingen.</p>'}
     </body></html>
