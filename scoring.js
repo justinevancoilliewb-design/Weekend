@@ -13,7 +13,7 @@ const QUESTIONS = [
   { key: 'ladies', type: 'open', text: 'Welke twee edele vrouwen mogen uw driemanschap voltooien?' },
   { key: 'onzichtbaar', type: 'open', text: 'Stel dat gij een dag en een nacht onzichtbaar waart, zonder dat een ziel het weet. Wat zoudt gij dan doen?' },
   { key: 'pinten_vrijdag', type: 'open', text: 'Hoeveel pinten mede zoudt gij op een gewone vrijdag in de herberg ledigen?' },
-  { key: 'festival', type: 'open', text: 'De Koning schenkt u vrije toegang tot één feestmaal in het ganse rijk. Welk festival kiest gij?' },
+  { key: 'festival', type: 'open', text: 'De Koning schenkt u vrije toegang tot één volksfeest in het ganse rijk. Welk festival kiest gij?' },
   { key: 'schoenen', type: 'open', text: 'Hoeveel goudstukken zoudt gij maximaal besteden aan een nieuw paar laarzen?' },
   { key: 'koosnaampje', type: 'open', text: 'Met welke tedere naam spreekt gij uw huidige liefste of uw laatste verloofde aan?' },
   { key: 'pdc_bijnaam', type: 'open', text: 'Bij uw intocht in de hal van het Wereldkampioenschap Pijlschieten, welk lied galmt door de zaal, en welke vlammende bijnaam draagt gij?' },
